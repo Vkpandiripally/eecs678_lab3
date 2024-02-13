@@ -132,8 +132,8 @@ int main(int argc, char *argv[])
 
     exit(0);
   }
-  close(p2[0])
-  close(p3[1])
+  close(p2[0]);
+  close(p3[1]);
 
   pid_4 = fork();
   if (pid_4 == 0) {
