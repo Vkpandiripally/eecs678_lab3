@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
     exit(0);
   }
 
-  close(p1[1])
+  close(p1[1]);
 
   pid_2 = fork();
   if (pid_2 == 0) {
@@ -88,16 +88,17 @@ int main(int argc, char *argv[])
     //Invoke execl for xargs and grep (use XARGS_EXEC and GREP_EXEC as paths)
     char cmdbuf[BSIZE];
     bzero(cmdbuf, BSIZE);
-    sprintf(cmdbuf, "%s %s -name \'*'.[ch]", GREP_EXEC, argv[1]);
+    sprintf(cmdbuf, "%s %s -c %s", XARGS_EXEC, GREP_EXEC, argv[2]);
 
-    if((execl(XARGS_EXEC, XARGS_EXEC, "-c", cmdbuf, (char*) 0))< 0){
+    if((execl(BASH_EXEC, BASH_EXEC, "-c", cmdbuf, (char*) 0))< 0){
       fprintf(stderr, "\nError execing find. ERROR#%d\n", errno);
+      return EXIT_FAILURE;
     }
 
     exit(0);
   }
-  close(p1[0])
-  close(p2[1])
+  close(p1[0]);
+  close(p2[1]);
 
   pid_3 = fork();
   if (pid_3 == 0) {
@@ -121,7 +122,7 @@ int main(int argc, char *argv[])
     //Invoke execl for sort (use SORT_EXEC as path)
     char cmdbuf[BSIZE];
     bzero(cmdbuf, BSIZE);
-    sprintf(cmdbuf, "%s %s -name \'*'.[ch]", SORT_EXEC, argv[1]);
+    sprintf(cmdbuf, "%s -t : +1.0 -2.0 --numeric --reverse", SORT_EXEC);
 
     if((execl(BASH_EXEC, BASH_EXEC, "-c", cmdbuf, (char*) 0))< 0){
       fprintf(stderr, "\nError execing find. ERROR#%d\n", errno);
@@ -154,7 +155,7 @@ int main(int argc, char *argv[])
     //Invoke execl for head (use HEAD_EXEC as path)
     char cmdbuf[BSIZE];
     bzero(cmdbuf, BSIZE);
-    sprintf(cmdbuf, "%s %s -name \'*'.[ch]", HEAD_EXEC, argv[1]);
+    sprintf(cmdbuf, "%s --line=%s", HEAD_EXEC, argv[1]);
 
     if((execl(BASH_EXEC, BASH_EXEC, "-c", cmdbuf, (char*) 0))< 0){
       fprintf(stderr, "\nError execing find. ERROR#%d\n", errno);
