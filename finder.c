@@ -44,10 +44,10 @@ int main(int argc, char *argv[])
     dup2(p1[1], STDOUT_FILENO);
     close(p1[0]);
 
-    close(p2[0])
-    close(p2[1])
-    close(p3[0])
-    close(p3[1])
+    close(p2[0]);
+    close(p2[1]);
+    close(p3[0]);
+    close(p3[1]);
 
     //STEP 3
     //Prepare a command string representing the find command (follow example from the slide)
@@ -115,8 +115,8 @@ int main(int argc, char *argv[])
     close(p2[1]);
     close(p3[0]);
 
-    close(p1[0])
-    close(p1[1])
+    close(p1[0]);
+    close(p1[1]);
 
     //STEP 7
     //Invoke execl for sort (use SORT_EXEC as path)
