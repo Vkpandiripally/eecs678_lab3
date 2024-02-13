@@ -33,7 +33,7 @@ int main()
     /* read contents of file and write it out to a pipe */
     while ((rsize = read(rfd, buf, BSIZE)) > 0) {
       /* XXX - this should write to a pipe - not to stdout */
-      write(STDOUT_FILENO, buf, rsize);
+      write(fd[1], buf, rsize);
     }
 
     close(rfd);
@@ -43,7 +43,7 @@ int main()
   pid_2 = fork();
   if (pid_2 == 0) {
     /* process b */
-#if 0
+    close(fd[1])
     size_t rsize;
     char buf[BSIZE];
 
@@ -53,10 +53,11 @@ int main()
     while ((rsize = read(STDIN_FILENO, buf, BSIZE)) > 0) {
       write(STDOUT_FILENO, buf, rsize);
     }
-#endif
 
     return 0;
   }
+  close(fd[0])
+  close(fd[1])
 
   /* shell process */
   if ((waitpid(pid_1, &status, 0)) == -1) {
