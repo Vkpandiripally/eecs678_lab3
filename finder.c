@@ -44,6 +44,11 @@ int main(int argc, char *argv[])
     dup2(p1[1], STDOUT_FILENO);
     close(p1[0]);
 
+    close(p2[0])
+    close(p2[1])
+    close(p3[0])
+    close(p3[1])
+
     //STEP 3
     //Prepare a command string representing the find command (follow example from the slide)
     //Invoke execl for bash and find (use BASH_EXEC and FIND_EXEC as paths)
@@ -59,6 +64,8 @@ int main(int argc, char *argv[])
     exit(0);
   }
 
+  close(p1[1])
+
   pid_2 = fork();
   if (pid_2 == 0) {
     /* Second Child */
@@ -69,9 +76,13 @@ int main(int argc, char *argv[])
 		//So, redirect standard output of this child process to p2's write end - written data will be automatically available at pipe p2's read end
 		//And, close all other pipe ends except the ones used to redirect the above two INPUT/OUTPUT (very important)
     dup2(p1[0], STDIN_FILENO);//read input
-    close(p1[1]);
     dup2(p2[1], STDOUT_FILENO);//write output
+
+    close(p1[1]);
     close(p2[0]);
+
+    close(p3[0]);
+    close(p3[1]);
 
     //STEP 5
     //Invoke execl for xargs and grep (use XARGS_EXEC and GREP_EXEC as paths)
@@ -85,6 +96,8 @@ int main(int argc, char *argv[])
 
     exit(0);
   }
+  close(p1[0])
+  close(p2[1])
 
   pid_3 = fork();
   if (pid_3 == 0) {
@@ -96,9 +109,13 @@ int main(int argc, char *argv[])
 		//So, redirect standard output of this child process to p3's write end - written data will be automatically available at pipe p3's read end
 		//And, close all other pipe ends except the ones used to redirect the above two INPUT/OUTPUT (very important)
     dup2(p2[0], STDIN_FILENO);//read input
-    close(p2[1]);
     dup2(p3[1], STDOUT_FILENO);//write output
+    
+    close(p2[1]);
     close(p3[0]);
+
+    close(p1[0])
+    close(p1[1])
 
     //STEP 7
     //Invoke execl for sort (use SORT_EXEC as path)
@@ -106,12 +123,16 @@ int main(int argc, char *argv[])
     bzero(cmdbuf, BSIZE);
     sprintf(cmdbuf, "%s %s -name \'*'.[ch]", SORT_EXEC, argv[1]);
 
-    // if((execl(BASH_EXEC, BASH_EXEC, "-c", cmdbuf, (char*) 0))< 0){
-    //   fprintf(stderr, "\nError execing find. ERROR#%d\n", errno);
+    if((execl(BASH_EXEC, BASH_EXEC, "-c", cmdbuf, (char*) 0))< 0){
+      fprintf(stderr, "\nError execing find. ERROR#%d\n", errno);
+      return EXIT_FAILURE;
+    }
     
 
     exit(0);
   }
+  close(p2[0])
+  close(p3[1])
 
   pid_4 = fork();
   if (pid_4 == 0) {
@@ -122,8 +143,12 @@ int main(int argc, char *argv[])
 		//Output of this child process should directly be to the standard output and NOT to any pipe
 		//And, close all other pipe ends except the ones used to redirect the above INPUT (very important)
     dup2(p3[0], STDIN_FILENO);//read input
+    close(p1[0]);
+    close(p1[1]);
+    close(p2[0]);
+    close(p2[1]);
+    
     close(p3[1]);
-    dup2(STDOUT_FILENO, STDOUT_FILENO);//write output
 
     //STEP 8
     //Invoke execl for head (use HEAD_EXEC as path)
@@ -131,12 +156,16 @@ int main(int argc, char *argv[])
     bzero(cmdbuf, BSIZE);
     sprintf(cmdbuf, "%s %s -name \'*'.[ch]", HEAD_EXEC, argv[1]);
 
-    // if((execl(BASH_EXEC, BASH_EXEC, "-c", cmdbuf, (char*) 0))< 0){
-    //   fprintf(stderr, "\nError execing find. ERROR#%d\n", errno);
+    if((execl(BASH_EXEC, BASH_EXEC, "-c", cmdbuf, (char*) 0))< 0){
+      fprintf(stderr, "\nError execing find. ERROR#%d\n", errno);
+      return EXIT_FAILURE;
+    }
     
 
     exit(0);
   }
+
+  close(p3[0]);
 
   if ((waitpid(pid_1, &status, 0)) == -1) {
     fprintf(stderr, "Process 1 encountered an error. ERROR%d", errno);
