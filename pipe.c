@@ -16,6 +16,8 @@ int main()
   /* XXX - need to declare pipes and make the pipe() system call before
    * forking any children
    */
+  int fd[2];
+  pipe(fd);
 
   pid_1 = fork();
   if (pid_1 == 0) { 
@@ -56,8 +58,8 @@ int main()
 
     return 0;
   }
-  close(fd[0])
-  close(fd[1])
+  close(fd[0]);
+  close(fd[1]);
 
   /* shell process */
   if ((waitpid(pid_1, &status, 0)) == -1) {
